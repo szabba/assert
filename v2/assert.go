@@ -29,7 +29,7 @@ func UsingPanic() Asserter {
 	return Using(nil)
 }
 
-// Using creates an Asserter uses onError to report failures.
+// Using creates an Asserter uses onErr to report failures.
 func Using(onErr ErrorFunc) Asserter {
 	return Asserter{onErr}
 }
@@ -38,16 +38,15 @@ func Using(onErr ErrorFunc) Asserter {
 type ErrorFunc func(msgFmt string, args ...any)
 
 // An Asserter is used to make assertions.
-//
-// For failed assertions, the zero asserter formats the message and panics.
 type Asserter struct{ onErr ErrorFunc }
 
 // That asserts cond is true.
 //
-// The ErrorFunc of the Asserter receives msgFmt and args as input.
-// If the Asserter has a nil ErrorFunc, That panics with the formatted message.
+// The error func of the asserter receives msgFmt and args as input.
+// If the asserter has a nil error func, That panics with a message formatted by fmt.Sprintf.
 //
-// The same asserter is returned to enable chaining multiple assertions on the same ErrorFunc.
+// When the assertion passes, the same asserter is returned.
+// This enables chaining multiple assertions that share and error func.
 func (a Asserter) That(cond bool, msgFmt string, args ...any) Asserter {
 	if !cond {
 		a.fail(msgFmt, args)

@@ -22,11 +22,14 @@
 
 package assert
 
+import (
+	v2 "github.com/szabba/assert/v2"
+)
+
 type ErrorFunc func(msgFmt string, args ...interface{})
 
 func That(cond bool, onError ErrorFunc, msgFmt string, args ...interface{}) {
-	if cond {
-		return
-	}
-	onError(msgFmt, args...)
+	v2.
+		Using(v2.ErrorFunc(onError)).
+		That(cond, msgFmt, args...)
 }
