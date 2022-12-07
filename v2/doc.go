@@ -96,9 +96,10 @@ We could have written ErrIsNil this way as well:
 We recommend that custom assertions return (bool, string).
 All the reusable assertions we provide are written this way.
 This
-- makes them easier to recognize,
-- makes them easier to modify, and
-- allows us to provide better error messages for complex cases.
+
+  - makes them easier to recognize,
+  - makes them easier to modify, and
+  - allows us to provide better error messages for complex cases.
 
 You don't have to write the function in this example though.
 Just use [theerr.IsNil].
