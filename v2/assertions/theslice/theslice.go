@@ -20,34 +20,36 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-// Package equal provides reusable assertions about equal values.
-package equal
+// Package theslice provides reusable assertions about slices.
+package theslice
 
 import (
 	"fmt"
 	"strings"
 )
 
-// Values asserts that two values of a [comparable] type are equal.
-//
-// [comparable]: https://go.dev/ref/spec#Type_constraints
-func Values[T comparable](got, want T) (bool, string) {
-	if got == want {
+// Empty asserts that s is an empty slice.
+func Empty[S ~[]T, T any](s S) (bool, string) {
+	if len(s) == 0 {
 		return true, ""
 	}
-	return false, fmt.Sprintf("got %#v, not %#v", got, want)
+	return false, fmt.Sprintf("got non-empty slice %#v", s)
 }
 
-// Slices asserts that two slices with element of a [comparable] type are equal.
+// NotEmpty asserts that s is not an empty slice.
+func NotEmpty[S ~[]T, T any](s S) (bool, string) {
+	if len(s) > 0 {
+		return true, ""
+	}
+	return false, fmt.Sprintf("got empty slice %#v", s)
+}
+
+// Equal asserts that an actual slice is equal to an expected one.
 //
-// Slices supports named slice types, ie, if you define MySlice as
-//
-//	type MySlice []int
-//
-// you can pass values of type MySlice to Slices.
-//
-// [comparable]: https://go.dev/ref/spec#Type_constraints
-func Slices[T comparable, S ~[]T](got, want S) (bool, string) {
+// Nil slices are never equal to non-nil slices.
+// Only slices of equal length can be equal.
+// The elements at each index must be equal in both slices.
+func Equal[S ~[]T, T comparable](got, want S) (bool, string) {
 	if got == nil && want != nil {
 		msg := fmt.Sprintf("got nil, not %#v", want)
 		return false, msg
@@ -87,4 +89,45 @@ func Slices[T comparable, S ~[]T](got, want S) (bool, string) {
 	}
 
 	return true, ""
+}
+
+// NotEqual asserts that the actual slice is not equal to another.
+//
+// For more details look at Equal.
+func NotEqual[S ~[]T, T comparable](got, wantNot S) (bool, string) {
+	if got == nil && wantNot != nil {
+		return true, ""
+	}
+
+	if got != nil && wantNot == nil {
+		return true, ""
+	}
+
+	if len(got) != len(wantNot) {
+		return true, ""
+	}
+
+	for i := range got {
+		if got[i] != wantNot[i] {
+			return true, ""
+		}
+	}
+
+	return false, fmt.Sprintf("got unwanted value %#v", got)
+}
+
+// Length asserts the len(s) is n.
+func Length[S ~[]T, T any](s S, n int) (bool, string) {
+	if len(s) == n {
+		return true, ""
+	}
+	return false, fmt.Sprintf("got slice of length %d, not %d", len(s), n)
+}
+
+// LengthNot asserts that len(s) is not n.
+func LengthNot[S ~[]T, T any](s S, n int) (bool, string) {
+	if len(s) != n {
+		return true, ""
+	}
+	return false, fmt.Sprintf("got slice of length %d", len(s))
 }

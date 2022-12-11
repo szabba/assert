@@ -61,7 +61,7 @@ For example:
 
 We provide some pre-made reusable [assertions], so you can call
 
-	assert.UsingPanic().That(equal.Values(got, want))
+	assert.UsingPanic().That(theval.Equal(got, want))
 
 instead of
 
