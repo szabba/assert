@@ -120,7 +120,7 @@ func TestLessThan(t *testing.T) {
 		assert.
 			Using(t.Errorf).
 			That(errFunc.Called()).
-			That(errFunc.MessageFormatsTo("got 1 <= 1"))
+			That(errFunc.MessageFormatsTo("got 1 >= 1"))
 	})
 
 	t.Run("1vs0", func(t *testing.T) {
@@ -134,7 +134,7 @@ func TestLessThan(t *testing.T) {
 		assert.
 			Using(t.Errorf).
 			That(errFunc.Called()).
-			That(errFunc.MessageFormatsTo("got 1 <= 0"))
+			That(errFunc.MessageFormatsTo("got 1 >= 0"))
 	})
 
 }

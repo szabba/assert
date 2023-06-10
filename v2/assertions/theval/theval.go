@@ -52,7 +52,7 @@ func LessThan[T constraints.Ordered](got, want T) (bool, string) {
 		return true, ""
 	}
 
-	msg := fmt.Sprintf("got %v <= %v", got, want)
+	msg := fmt.Sprintf("got %v >= %v", got, want)
 	return false, msg
 }
 
