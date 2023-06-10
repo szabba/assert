@@ -26,6 +26,8 @@ package theval
 import (
 	"fmt"
 	"reflect"
+
+	"golang.org/x/exp/constraints"
 )
 
 // Equal asserts that an actual value is equal to an expected value of the same.
@@ -42,6 +44,16 @@ func NotEqual[T comparable](got, wantNot T) (bool, string) {
 		return true, ""
 	}
 	return false, fmt.Sprintf("got unwanted value %#v", got)
+}
+
+// LessThan asserts that an actual value is less than another.
+func LessThan[T constraints.Ordered](got, want T) (bool, string) {
+	if got < want {
+		return true, ""
+	}
+
+	msg := fmt.Sprintf("got %v <= %v", got, want)
+	return false, msg
 }
 
 // Zero asserts that v is the zero value of it's underlying type.

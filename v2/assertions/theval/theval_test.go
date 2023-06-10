@@ -93,6 +93,52 @@ func TestNotEqual(t *testing.T) {
 
 }
 
+func TestLessThan(t *testing.T) {
+
+	t.Run("1vs3", func(t *testing.T) {
+		// given
+		var errFunc assertiontesting.ErrFunc
+
+		// when
+		assert.Using(errFunc.Record).That(theval.LessThan(1, 3))
+
+		// then
+		assert.
+			Using(t.Errorf).
+			That(errFunc.NotCalled()).
+			That(errFunc.MessageFormatsTo(""))
+	})
+
+	t.Run("1vs1", func(t *testing.T) {
+		// given
+		var errFunc assertiontesting.ErrFunc
+
+		// when
+		assert.Using(errFunc.Record).That(theval.LessThan(1, 1))
+
+		// then
+		assert.
+			Using(t.Errorf).
+			That(errFunc.Called()).
+			That(errFunc.MessageFormatsTo("got 1 <= 1"))
+	})
+
+	t.Run("1vs0", func(t *testing.T) {
+		// given
+		var errFunc assertiontesting.ErrFunc
+
+		// when
+		assert.Using(errFunc.Record).That(theval.LessThan(1, 0))
+
+		// then
+		assert.
+			Using(t.Errorf).
+			That(errFunc.Called()).
+			That(errFunc.MessageFormatsTo("got 1 <= 0"))
+	})
+
+}
+
 func TestZero(t *testing.T) {
 
 	t.Run("True", func(t *testing.T) {
