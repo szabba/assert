@@ -131,3 +131,27 @@ func LengthNot[S ~[]T, T any](s S, n int) (bool, string) {
 	}
 	return false, fmt.Sprintf("got slice of length %d", len(s))
 }
+
+// LengthAtLeast asserts that len(s) >= n.
+func LengthAtLeast[S ~[]T, T any](s S, n int) (bool, string) {
+	if len(s) >= n {
+		return true, ""
+	}
+	return false, fmt.Sprintf("got slice of length %d, less than %d", len(s), n)
+}
+
+// At assers that the i-th element of s passes the assertion in f.
+func At[S ~[]T, T any](s S, i int, f func(t T) (bool, string)) (bool, string) {
+	ok, msg := LengthAtLeast(s, i+1)
+	if !ok {
+		return ok, msg
+	}
+
+	el := s[i]
+	ok, msg = f(el)
+	if !ok {
+		return ok, fmt.Sprintf("element %d, %#v does not pass: %s", i, el, msg)
+	}
+
+	return true, ""
+}

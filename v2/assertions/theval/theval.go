@@ -57,7 +57,7 @@ func LessThan[T constraints.Ordered](got, want T) (bool, string) {
 }
 
 // Zero asserts that v is the zero value of it's underlying type.
-func Zero(v any) (bool, string) {
+func Zero[T any](v T) (bool, string) {
 	rv := reflect.ValueOf(v)
 
 	if rv.IsZero() {
@@ -69,7 +69,7 @@ func Zero(v any) (bool, string) {
 }
 
 // NotZero asserts that v is not the zero value of it's underlying type.
-func NotZero(v any) (bool, string) {
+func NotZero[T any](v T) (bool, string) {
 	if !reflect.ValueOf(v).IsZero() {
 		return true, ""
 	}

@@ -29,6 +29,7 @@ import (
 
 	"github.com/szabba/assert/v2"
 	"github.com/szabba/assert/v2/assertions/assertiontesting"
+	"github.com/szabba/assert/v2/assertions/theval"
 
 	"github.com/szabba/assert/v2/assertions/theslice"
 )
@@ -426,6 +427,146 @@ func TestLengthNot(t *testing.T) {
 			// when
 			assert.Using(errFunc.Record).
 				That(theslice.LengthNot(tt.Slice, tt.Length))
+
+			// then
+			assert.Using(t.Errorf).
+				That(errFunc.Called()).
+				That(errFunc.MessageFormatsTo(tt.Message))
+		})
+	}
+
+}
+
+func TestLengthAtLeast(t *testing.T) {
+
+	okCases := map[string]struct {
+		Slice  []int
+		Length int
+	}{
+		"True/NilLengthAtLeast0": {
+			Slice:  nil,
+			Length: 0,
+		},
+		"True/EmptyLengthAtLeast0": {
+			Slice:  []int{},
+			Length: 0,
+		},
+		"True/Make1LengthAtLeast0": {
+			Slice:  make([]int, 1),
+			Length: 0,
+		},
+		"True/Make1LengthAtLeast1": {
+			Slice:  make([]int, 1),
+			Length: 1,
+		},
+		"True/Make2LengthAtLeast2": {
+			Slice:  make([]int, 3),
+			Length: 2,
+		},
+	}
+
+	for name, tt := range okCases {
+		t.Run(name, func(t *testing.T) {
+			// given
+			var errFunc assertiontesting.ErrFunc
+
+			// when
+			assert.Using(errFunc.Record).
+				That(theslice.LengthAtLeast(tt.Slice, tt.Length))
+
+			// then
+			assert.Using(t.Errorf).That(errFunc.NotCalled())
+		})
+	}
+
+	oopsCases := map[string]struct {
+		Slice   []int
+		Length  int
+		Message string
+	}{
+		"False/NilNotLengthAtLeast1": {
+			Slice:   nil,
+			Length:  1,
+			Message: "got slice of length 0, less than 1",
+		},
+		"False/EmptyNotLengthAtLeast1": {
+			Slice:   []int{},
+			Length:  1,
+			Message: "got slice of length 0, less than 1",
+		},
+
+		"False/EmptyNotLengthAtLeast11": {
+			Slice:   []int{},
+			Length:  11,
+			Message: "got slice of length 0, less than 11",
+		},
+		"False/Make1NotLengthAtLeast3": {
+			Slice:   make([]int, 1),
+			Length:  3,
+			Message: "got slice of length 1, less than 3",
+		},
+	}
+
+	for name, tt := range oopsCases {
+		t.Run(name, func(t *testing.T) {
+			// given
+			var errFunc assertiontesting.ErrFunc
+
+			// when
+			assert.Using(errFunc.Record).
+				That(theslice.LengthAtLeast(tt.Slice, tt.Length))
+
+			// then
+			assert.Using(t.Errorf).
+				That(errFunc.Called()).
+				That(errFunc.MessageFormatsTo(tt.Message))
+		})
+	}
+
+}
+
+func TestAt(t *testing.T) {
+
+	t.Run("True", func(t *testing.T) {
+		// given
+		var errFunc assertiontesting.ErrFunc
+
+		// when
+		assert.Using(errFunc.Record).
+			That(theslice.At([]int{3, 7, 4}, 1, theval.NotZero[int]))
+
+		// then
+		assert.Using(t.Errorf).That(errFunc.NotCalled())
+	})
+
+	oopsCases := map[string]struct {
+		Slice   []int
+		At      int
+		Assert  func(int) (bool, string)
+		Message string
+	}{
+		"False/SliceTooShort": {
+			Slice:   nil,
+			At:      1,
+			Assert:  theval.NotZero[int],
+			Message: "got slice of length 0, less than 2",
+		},
+		"False/ElementDoesNotPass": {
+			Slice:   []int{3, 7, 4},
+			At:      1,
+			Assert:  theval.Zero[int],
+			Message: "element 1, 7 does not pass: got 7, not zero value 0",
+		},
+	}
+
+	for name, tt := range oopsCases {
+		t.Run(name, func(t *testing.T) {
+			// given
+			var errFunc assertiontesting.ErrFunc
+
+			// when
+			assert.Using(errFunc.Record).
+				That(theslice.At(tt.Slice, tt.At, tt.Assert))
 
 			// then
 			assert.Using(t.Errorf).
