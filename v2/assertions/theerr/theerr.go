@@ -36,6 +36,17 @@ func IsNil(err error) (bool, string) {
 	return false, fmt.Sprintf("unexpected error: %s", err)
 }
 
+// IsNotNil asserts that the error is not nil.
+//
+// This is less precise than [Is] or [IsA].
+// It is better than nothing when there aren't exposed sentinels / types to check for.
+func IsNotNil(err error) (bool, string) {
+	if err != nil {
+		return true, ""
+	}
+	return false, "unexpected nil error"
+}
+
 // Is asserts that got is the wanted error.
 //
 // This is aware of error composition.
@@ -60,6 +71,9 @@ func IsA[T error](err error) (bool, string) {
 	var typedErr T
 	if errors.As(err, &typedErr) {
 		return true, ""
+	}
+	if err == nil {
+		return false, fmt.Sprintf("got nil error, not a %T", typedErr)
 	}
 	return false, fmt.Sprintf("got error of type %T, not %T", err, typedErr)
 }

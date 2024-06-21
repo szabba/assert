@@ -63,6 +63,35 @@ func TestIsNil(t *testing.T) {
 
 }
 
+func TestIsNotNil(t *testing.T) {
+
+	t.Run("True", func(t *testing.T) {
+		// given
+		var errFunc assertiontesting.ErrFunc
+
+		// when
+		assert.Using(errFunc.Record).That(theerr.IsNotNil(io.EOF))
+
+		// then
+		assert.Using(t.Errorf).That(errFunc.NotCalled())
+	})
+
+	t.Run("False", func(t *testing.T) {
+		// given
+		var errFunc assertiontesting.ErrFunc
+
+		// when
+		assert.Using(errFunc.Record).That(theerr.IsNotNil(nil))
+
+		// then
+		assert.
+			Using(t.Errorf).
+			That(errFunc.Called()).
+			That(errFunc.MessageFormatsTo("unexpected nil error"))
+	})
+
+}
+
 func TestIs(t *testing.T) {
 
 	t.Run("True/Nil", func(t *testing.T) {
@@ -132,7 +161,21 @@ func TestIsA(t *testing.T) {
 		assert.Using(t.Errorf).That(errFunc.NotCalled())
 	})
 
-	t.Run("False", func(t *testing.T) {
+	t.Run("False/Nil", func(t *testing.T) {
+		// given
+		var errFunc assertiontesting.ErrFunc
+
+		// when
+		assert.Using(errFunc.Record).
+			That(theerr.IsA[*os.PathError](nil))
+
+		// then
+		assert.Using(t.Errorf).
+			That(errFunc.Called()).
+			That(errFunc.MessageFormatsTo("got nil error, not a *fs.PathError"))
+	})
+
+	t.Run("False/TypeMismatch", func(t *testing.T) {
 		// given
 		var errFunc assertiontesting.ErrFunc
 		err := new(os.SyscallError)
