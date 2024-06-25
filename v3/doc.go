@@ -96,7 +96,8 @@ For example:
 
 UsingFmt will pass messages of any non-nil errors to the function.
 
-# If for some reason you need the error itself, call Using instead.
+Sometimes you might need the error itself - not just the message.
+In that case you want to call Using, not UsingPanic or UsingFmt.
 
 [assertions]: https://pkg.go.dev/github.com/szabba/assert/v3/assertions
 [theerr.IsNil]: https://pkg.go.dev/github.com/szabba/assert/v3/assertions/theerr#IsNil
