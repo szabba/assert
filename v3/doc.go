@@ -21,34 +21,71 @@
 // SOFTWARE.
 
 /*
-Package assert provides a core, minimal API for making assertions.
+Package assert provides a flexible, extensible API for making assertions.
 
 To make a simple assertion that will panic on failure call:
 
-	assert.UsingPanic().That(false, "Oops")
+	assert.UsingPanic().True(false, "Oops")
 
 You can also format failure messages:
 
-	assert.UsingPanic().That(0 > 1, "%d is not greater than %d", 0, 1)
+	assert.UsingPanic().True(0 > 1, "%d is not greater than %d", 0, 1)
 
 UsingPanic returns an Asserter.
 You can chain multiple assertions on it.
 
 	assert.UsingPanic().
-	    That(1 > 0, "%d is not greater than %d", 1, 0).
-	    That(2 > 0, "%d is not greater than %d", 2, 0)
+	    True(1 > 0, "%d is not greater than %d", 1, 0).
+	    True(2 > 0, "%d is not greater than %d", 2, 0)
+
+# Reusable assertions
+
+True is good for ad hoc one-of assertions.
+
+We provide some pre-made reusable [assertions], so you can call
+
+	assert.UsingPanic().That(theval.Equal(got, want))
+
+instead of
+
+	assert.UsingPanic().True(got == want, "got %#v, not %#v", got, want)
+
+As long as the reusable assertion is well named, the first version is easier to read.
+It is also less error prone and easier to modify.
+
+# Custom assertions
+
+You can write your own reusable assertions as well.
+Just write a function that returns a non-nil error when the assertion fails:
+
+	func ErrIsNil(err error) error {
+	    if err != nil {
+			return fmt.Errorf("got unexpected non-nil error: %s", err)
+		}
+		retun nil
+	}
+
+You can then pass it's result to That:
+
+	assert.UsingPanic().That(ErrIsNil(err))
+
+You don't have to write the function in this example though.
+Just use [theerr.IsNil].
 
 # Alternative failure reactions
 
 Depending on the situation you might want different reactions to a failed assertion.
-To do that call Using with an ErrorFunc.
 
-	assert.Using(log.Panicf).That(0 > 1, "%d is not greater than %d", 0, 1)
+The common case for that is to call a function that at least outputs some information.
+To do that call UsingFmt.
 
-An ErrorFunc specifies what the reaction to failure should be.
-When Using is passed a nil ErrorFunc, it behaves the same as UsingPanic.
+	assert.UsingFmt(log.Panicf).That(0 > 1, "%d is not greater than %d", 0, 1)
 
-You can use many functions and methods in the standard library as ErrorFuncs.
+The argument to UsingFmt has a the signature
+
+	func(string, ...any)
+
+Many functions and methods in the standard library have that signature.
 For example:
 
   - testing.(*T).Errorf
@@ -57,55 +94,11 @@ For example:
   - log.Panicf
   - log.Fatalf
 
-# Reusable assertions
+UsingFmt will pass messages of any non-nil errors to the function.
 
-We provide some pre-made reusable [assertions], so you can call
+# If for some reason you need the error itself, call Using instead.
 
-	assert.UsingPanic().That(theval.Equal(got, want))
-
-instead of
-
-	assert.UsingPanic().That(got == want, "got %#v, not %#v", got, want)
-
-As long as the reusable assertion is well named, the first version is easier to read.
-The first version is also less error prone and easier to modify.
-In more complex cases a reusable assertion can also provide more detailed error messages.
-
-Reusable assertions rely on a feature of Go that is used relatively rarely.
-You can read about it in the [Calls] section of the Go language specification.
-
-# Custom assertions
-
-You can write your own reusable assertions as well.
-Just write a function that returns the arguments you would pass to That:
-
-	func ErrIsNil(err error) (bool, string) {
-	    return err == nil, fmt.Sprintf("unexpected error: %s", err)
-	}
-
-You can then pass it's result to That instead of writing the arguments out:
-
-	assert.UsingPanic().That(ErrIsNil(err))
-
-We could have written ErrIsNil this way as well:
-
-	func ErrIsNil(err error) (bool, string, any) {
-	    return err == nil, "unexpected error: %s, any
-	}
-
-We recommend that custom assertions return (bool, string).
-All the reusable assertions we provide are written this way.
-This
-
-  - makes them easier to recognize,
-  - makes them easier to modify, and
-  - allows us to provide better error messages for complex cases.
-
-You don't have to write the function in this example though.
-Just use [theerr.IsNil].
-
-[assertions]: https://pkg.go.dev/github.com/szabba/assert/v2/assertions
-[Calls]: https://go.dev/ref/spec#Calls
-[theerr.IsNil]: https://pkg.go.dev/github.com/szabba/assert/v2/assertions/theerr#IsNil
+[assertions]: https://pkg.go.dev/github.com/szabba/assert/v3/assertions
+[theerr.IsNil]: https://pkg.go.dev/github.com/szabba/assert/v3/assertions/theerr#IsNil
 */
 package assert

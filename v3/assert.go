@@ -25,15 +25,32 @@ package assert
 import "fmt"
 
 // UsingPanic creates an Asserter that panics to report failures.
+//
+// If you're using this library in tests you probably want UsingFmt instead.
 func UsingPanic() Asserter {
 	return Using(nil)
 }
 
 // Using creates an Asserter that uses onErr to report failures.
+//
+// Using is the most generic of the Using* functions.
+//
+// If you're using this library in tests you probably want UsingFmt instead.
 func Using(onErr func(error)) Asserter {
 	return Asserter{onErr}
 }
 
+// UsingFmt creates an Asserter that uses fmtFunc to report failures.
+//
+// If you're using this library in tests you probably want to call either
+//
+//	assert.UsingFmt(t.Errorf).That(somethingHolds())
+//
+// or
+//
+//	assert.UsingFmt(t.Fatalf).That(somethingHolds())
+//
+// depending on whether you want the test to continue on failure or not.
 func UsingFmt(fmtFunc func(string, ...any)) Asserter {
 	onErr := func(err error) { fmtFunc(err.Error()) }
 	return Asserter{onErr}
