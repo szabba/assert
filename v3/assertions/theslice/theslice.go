@@ -50,6 +50,17 @@ func NotEmpty[S ~[]T, T any](s S) error {
 // Only slices of equal length can be equal.
 // The elements at each index must be equal in both slices.
 func Equal[S ~[]T, T comparable](got, want S) error {
+	return EqualFunc(got, want, func(l, r T) bool { return l == r })
+}
+
+// EqualFunc asserts that an actual slice is equal to an expected one.
+// Elements are compared for equality using the function eq.
+//
+// Nil slices are never equal to non-nil slices.
+// Only slices of equal length can be equal.
+// The elements at each index must be equal in both slices, as determined by eq.
+func EqualFunc[S ~[]T, T any](got, want S, eq func(T, T) bool) error {
+
 	if got == nil && want != nil {
 		return fmt.Errorf("got nil, not %#v", want)
 	}
@@ -66,7 +77,7 @@ func Equal[S ~[]T, T comparable](got, want S) error {
 
 	diffs := make([]int, 0, len(got))
 	for i := range got {
-		if got[i] != want[i] {
+		if !eq(got[i], want[i]) {
 			diffs = append(diffs, i)
 		}
 	}
