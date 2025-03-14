@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2022 Karol Marcjan
+// Copyright (c) 2022-2025 Karol Marcjan
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -44,7 +44,7 @@ func NotEmpty[S ~[]T, T any](s S) error {
 	return nil
 }
 
-// Equal asserts that an actual slice is equal to an expected one.
+// Equal asserts that an actual slice is equal to an expected one, element-by-element.
 //
 // Nil slices are never equal to non-nil slices.
 // Only slices of equal length can be equal.
@@ -53,7 +53,7 @@ func Equal[S ~[]T, T comparable](got, want S) error {
 	return EqualFunc(got, want, func(l, r T) bool { return l == r })
 }
 
-// EqualFunc asserts that an actual slice is equal to an expected one.
+// EqualFunc asserts that an actual slice is equal to an expected one, element-by-element.
 // Elements are compared for equality using the function eq.
 //
 // Nil slices are never equal to non-nil slices.
@@ -102,7 +102,7 @@ func EqualFunc[S ~[]T, T any](got, want S, eq func(T, T) bool) error {
 	return nil
 }
 
-// NotEqual asserts that the actual slice is not equal to another.
+// NotEqual asserts that the actual slice is not equal to another, element-by-element.
 //
 // For more details look at Equal.
 func NotEqual[S ~[]T, T comparable](got, wantNot S) error {

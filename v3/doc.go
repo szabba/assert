@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2022 Karol Marcjan
+// Copyright (c) 2022-2025 Karol Marcjan
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -40,7 +40,7 @@ You can chain multiple assertions on it.
 
 # Reusable assertions
 
-True is good for ad hoc one-of assertions.
+[True] is good for ad hoc one-of assertions.
 
 We provide some pre-made reusable [assertions], so you can call
 
@@ -55,7 +55,7 @@ It is also less error prone and easier to modify.
 
 # Custom assertions
 
-You can write your own reusable assertions as well.
+You can write your own reusable assertions.
 Just write a function that returns a non-nil error when the assertion fails:
 
 	func ErrIsNil(err error) error {
@@ -65,7 +65,7 @@ Just write a function that returns a non-nil error when the assertion fails:
 		retun nil
 	}
 
-You can then pass it's result to That:
+You can then pass it's result to [That]:
 
 	assert.UsingPanic().That(ErrIsNil(err))
 
@@ -76,16 +76,16 @@ Just use [theerr.IsNil].
 
 Depending on the situation you might want different reactions to a failed assertion.
 
-The common case for that is to call a function that at least outputs some information.
-To do that call UsingFmt.
+A common case for that is to call a function that at least outputs some information.
+To do that call [UsingFmt].
 
 	assert.UsingFmt(log.Panicf).That(0 > 1, "%d is not greater than %d", 0, 1)
 
-The argument to UsingFmt has a the signature
+The argument to [UsingFmt] has a the signature
 
 	func(string, ...any)
 
-Many functions and methods in the standard library have that signature.
+Many functions and methods in the standard library match this.
 For example:
 
   - testing.(*T).Errorf
@@ -94,10 +94,10 @@ For example:
   - log.Panicf
   - log.Fatalf
 
-UsingFmt will pass messages of any non-nil errors to the function.
+[UsingFmt] will pass messages of any non-nil errors to the function.
 
 Sometimes you might need the error itself - not just the message.
-In that case you want to call Using, not UsingPanic or UsingFmt.
+In that case you want to call Using, not UsingPanic or [UsingFmt].
 
 [assertions]: https://pkg.go.dev/github.com/szabba/assert/v3/assertions
 [theerr.IsNil]: https://pkg.go.dev/github.com/szabba/assert/v3/assertions/theerr#IsNil

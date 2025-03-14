@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2022 Karol Marcjan
+// Copyright (c) 2022-2025 Karol Marcjan
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -33,7 +33,7 @@ func UsingPanic() Asserter {
 
 // Using creates an Asserter that uses onErr to report failures.
 //
-// Using is the most generic of the Using* functions.
+// Using is the most general of the Using* functions.
 //
 // If you're using this library in tests you probably want UsingFmt instead.
 func Using(onErr func(error)) Asserter {
@@ -66,6 +66,9 @@ type Asserter struct{ onErr func(error) }
 //
 // When the assertion passes, the same asserter is returned.
 // This enables chaining multiple assertions that share an error func.
+//
+// When the assertion fails, the error func is called before returning.
+// If it panics, the chain is interrupted.
 func (a Asserter) That(err error) Asserter {
 	if err != nil {
 		a.fail(err)
@@ -80,6 +83,9 @@ func (a Asserter) That(err error) Asserter {
 //
 // When the assertion passes, the same asserter is returned.
 // This enables chaining multiple assertions that share and error func.
+//
+// When the assertion fails, the error func is called before returning.
+// If it panics, the chain is interrupted.
 func (a Asserter) True(cond bool, msgFmt string, args ...any) Asserter {
 	if !cond {
 		err := fmt.Errorf(msgFmt, args...)
