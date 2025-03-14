@@ -30,7 +30,7 @@ import (
 	"golang.org/x/exp/constraints"
 )
 
-// Equal asserts that an actual value is equal to an expected value of the same.
+// Equal asserts that an actual value is equal to an expected one, as per the Go == operator.
 func Equal[T comparable](got, want T) error {
 	if got != want {
 		return fmt.Errorf("got %#v, not %#v", got, want)
@@ -38,10 +38,26 @@ func Equal[T comparable](got, want T) error {
 	return nil
 }
 
-// NotEqual asserts that an actual value is not equal to another.
+// NotEqual asserts that an actual value is not equal to another, as per the Go == operator.
 func NotEqual[T comparable](got, wantNot T) error {
 	if got == wantNot {
 		return fmt.Errorf("got unwanted value %#v", got)
+	}
+	return nil
+}
+
+// DeepEqual asserts that a value is equal to an expected one, as determined by [reflect.DeepEqual].
+func DeepEqual(got, want any) error {
+	if !reflect.DeepEqual(got, want) {
+		return fmt.Errorf("got %#v, not %#v", got, want)
+	}
+	return nil
+}
+
+// DeepNotEqual asserts that a value is not equal to another, as determined by [reflect.DeepEqual].
+func DeepNotEqual(got, want any) error {
+	if reflect.DeepEqual(got, want) {
+		return fmt.Errorf("got unwanted value %#v", want)
 	}
 	return nil
 }

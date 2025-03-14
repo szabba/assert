@@ -93,6 +93,74 @@ func TestNotEqual(t *testing.T) {
 
 }
 
+func TestDeepEqual(t *testing.T) {
+
+	t.Run("True", func(t *testing.T) {
+		// given
+		var errFunc assertiontesting.ErrFunc
+
+		got, want := []int{1}, []int{1}
+
+		// when
+		assert.Using(errFunc.Record).That(theval.DeepEqual(got, want))
+
+		// then
+		assert.
+			UsingFmt(t.Errorf).
+			That(errFunc.NotCalled())
+	})
+
+	t.Run("False", func(t *testing.T) {
+		// given
+		var errFunc assertiontesting.ErrFunc
+
+		got, wantNot := []int{1}, []int{2}
+
+		// when
+		assert.Using(errFunc.Record).That(theval.DeepEqual(got, wantNot))
+
+		// then
+		assert.
+			UsingFmt(t.Errorf).
+			That(errFunc.Called()).
+			That(errFunc.MessageFormatsTo("got []int{1}, not []int{2}"))
+	})
+}
+
+func TestDeepNotEqual(t *testing.T) {
+
+	t.Run("True", func(t *testing.T) {
+		// given
+		var errFunc assertiontesting.ErrFunc
+
+		got, want := []int{1}, []int{2}
+
+		// when
+		assert.Using(errFunc.Record).That(theval.DeepNotEqual(got, want))
+
+		// then
+		assert.
+			UsingFmt(t.Errorf).
+			That(errFunc.NotCalled())
+	})
+
+	t.Run("False", func(t *testing.T) {
+		// given
+		var errFunc assertiontesting.ErrFunc
+
+		got, wantNot := []int{2}, []int{2}
+
+		// when
+		assert.Using(errFunc.Record).That(theval.DeepNotEqual(got, wantNot))
+
+		// then
+		assert.
+			UsingFmt(t.Errorf).
+			That(errFunc.Called()).
+			That(errFunc.MessageFormatsTo("got unwanted value []int{2}"))
+	})
+}
+
 func TestLessThan(t *testing.T) {
 
 	t.Run("1vs3", func(t *testing.T) {
