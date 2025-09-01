@@ -232,6 +232,19 @@ func TestZero(t *testing.T) {
 			That(errFunc.MessageFormatsTo("got 1, not zero value 0"))
 	})
 
+	t.Run("NilAny", func(t *testing.T) {
+		// given
+		var v any
+
+		var errFunc assertiontesting.ErrFunc
+
+		// when
+		assert.Using(errFunc.Record).That(theval.NotZero(v))
+
+		// then
+		assert.UsingFmt(t.Errorf).That(errFunc.NotCalled())
+	})
+
 }
 
 func TestNotZero(t *testing.T) {
@@ -258,6 +271,21 @@ func TestNotZero(t *testing.T) {
 		assert.UsingFmt(t.Errorf).
 			That(errFunc.Called()).
 			That(errFunc.MessageFormatsTo("got zero value 0"))
+	})
+
+	t.Run("NilAny", func(t *testing.T) {
+		// given
+		var v any
+
+		var errFunc assertiontesting.ErrFunc
+
+		// when
+		assert.Using(errFunc.Record).That(theval.NotZero(v))
+
+		// then
+		assert.UsingFmt(t.Errorf).
+			That(errFunc.Called()).
+			That(errFunc.MessageFormatsTo("got zero value <nil>"))
 	})
 
 }

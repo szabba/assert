@@ -73,7 +73,6 @@ func LessThan[T constraints.Ordered](got, want T) error {
 // Zero asserts that v is the zero value of it's underlying type.
 func Zero[T any](v T) error {
 	rv := reflect.ValueOf(v)
-
 	if !rv.IsZero() {
 		var z T
 		return fmt.Errorf("got %#v, not zero value %#v", v, z)
@@ -84,7 +83,8 @@ func Zero[T any](v T) error {
 
 // NotZero asserts that v is not the zero value of it's underlying type.
 func NotZero[T any](v T) error {
-	if reflect.ValueOf(v).IsZero() {
+	rv := reflect.ValueOf(v)
+	if reflect.ValueOf(rv).IsZero() || rv.IsZero() {
 		return fmt.Errorf("got zero value %#v", v)
 	}
 	return nil
