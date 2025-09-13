@@ -69,6 +69,26 @@ func EqualFunc[S ~[]T, T any](got, want S, eq func(T, T) bool) error {
 		return fmt.Errorf("got %#v, not nil", got)
 	}
 
+	return EqualElementsFunc(got, want, eq)
+}
+
+// EqualElements asserts that two slices have all elements equal, element-by-element.
+//
+// Nil and empty slices compare equal.
+// Only slices of equal length can have equal.
+// The elements at each index must be equal in both slices.
+func EqualElements[S ~[]T, T comparable](got, want S) error {
+	return EqualElementsFunc(got, want, func(l, r T) bool { return l == r })
+}
+
+// EqualElementsFunc asserts that two slices have all elements equal, element-by-element.
+// Elements are compared for equality using the function eq.
+//
+// Nil and empty slices compare equal.
+// Only slices of equal length can have equal.
+// The elements at each index must be equal in both slices, as determined by eq.
+func EqualElementsFunc[S ~[]T, T any](got, want S, eq func(T, T) bool) error {
+
 	if len(got) != len(want) {
 		return fmt.Errorf(
 			"got %#v (of length %d), not %#v (of length %d)",

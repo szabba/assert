@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2022 Karol Marcjan
+// Copyright (c) 2022-2025 Karol Marcjan
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -200,6 +200,92 @@ func TestEqual(t *testing.T) {
 			assert.
 				Using(onErr.Record).
 				That(theslice.Equal(tt.Got, tt.Want))
+
+			// then
+			assert.
+				UsingFmt(t.Errorf).
+				That(onErr.Called()).
+				That(onErr.MessageFormatsTo(tt.Message))
+		})
+	}
+}
+
+func TestEqualElements(t *testing.T) {
+
+	nameGiven := func(got, want []int) string {
+		mightHaveSpaces := fmt.Sprintf("Got%#vWant%#v", got, want)
+		return strings.ReplaceAll(mightHaveSpaces, " ", "")
+	}
+
+	okCases := []struct {
+		Got, Want []int
+	}{
+		{Got: nil, Want: nil},
+		{Got: []int{}, Want: nil},
+		{Got: nil, Want: []int{}},
+		{Got: []int{}, Want: []int{}},
+		{Got: []int{0}, Want: []int{0}},
+		{Got: []int{0, 1}, Want: []int{0, 1}},
+	}
+
+	for _, tt := range okCases {
+		name := nameGiven(tt.Got, tt.Want)
+
+		t.Run(name, func(t *testing.T) {
+			// given
+			var onErr assertiontesting.ErrFunc
+
+			// when
+			assert.Using(onErr.Record).
+				That(theslice.EqualElements(tt.Got, tt.Want))
+
+			// then
+			assert.UsingFmt(t.Errorf).That(onErr.NotCalled())
+		})
+	}
+
+	oopsCases := []struct {
+		Got, Want []int
+		Message   string
+	}{
+		{
+			Got:     []int{},
+			Want:    []int{0},
+			Message: "got []int{} (of length 0), not []int{0} (of length 1)",
+		},
+		{
+			Got:     []int{1},
+			Want:    []int{2},
+			Message: "got slice []int{1}, not []int{2}: element at position 0 is 1, not 2",
+		},
+		{
+			Got:     []int{1, 2},
+			Want:    []int{1, 3},
+			Message: "got slice []int{1, 2}, not []int{1, 3}: element at position 1 is 2, not 3",
+		},
+		{
+			Got:  []int{1, 2},
+			Want: []int{3, 4},
+			Message: lines(
+				"got slice []int{1, 2}, not []int{3, 4}:",
+				"element at position 0 is 1, not 3",
+				"element at position 1 is 2, not 4",
+			),
+		},
+	}
+
+	for _, tt := range oopsCases {
+
+		name := nameGiven(tt.Got, tt.Want)
+
+		t.Run(name, func(t *testing.T) {
+			// given
+			var onErr assertiontesting.ErrFunc
+
+			// when
+			assert.
+				Using(onErr.Record).
+				That(theslice.EqualElements(tt.Got, tt.Want))
 
 			// then
 			assert.
