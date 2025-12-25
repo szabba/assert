@@ -44,7 +44,7 @@ func TestEmpty(t *testing.T) {
 		assert.Using(errFunc.Record).That(theslice.Empty[[]int](nil))
 
 		// then
-		assert.UsingFmt(t.Errorf).That(errFunc.NotCalled())
+		assert.FailingTest(t).That(errFunc.NotCalled())
 	})
 
 	t.Run("True/NotNil", func(t *testing.T) {
@@ -56,7 +56,7 @@ func TestEmpty(t *testing.T) {
 		assert.Using(errFunc.Record).That(theslice.Empty(s))
 
 		// then
-		assert.UsingFmt(t.Errorf).That(errFunc.NotCalled())
+		assert.FailingTest(t).That(errFunc.NotCalled())
 	})
 
 	t.Run("False", func(t *testing.T) {
@@ -68,7 +68,7 @@ func TestEmpty(t *testing.T) {
 		assert.Using(errFunc.Record).That(theslice.Empty(s))
 
 		// then
-		assert.UsingFmt(t.Errorf).
+		assert.FailingTest(t).
 			That(errFunc.Called()).
 			That(errFunc.MessageFormatsTo("got non-empty slice []int{1, 2}"))
 	})
@@ -87,7 +87,7 @@ func TestNotEmpty(t *testing.T) {
 			That(theslice.NotEmpty(s))
 
 		// then
-		assert.UsingFmt(t.Errorf).That(errFunc.NotCalled())
+		assert.FailingTest(t).That(errFunc.NotCalled())
 	})
 
 	t.Run("False/NotNil", func(t *testing.T) {
@@ -99,7 +99,7 @@ func TestNotEmpty(t *testing.T) {
 		assert.Using(errFunc.Record).That(theslice.NotEmpty(s))
 
 		// then
-		assert.UsingFmt(t.Errorf).
+		assert.FailingTest(t).
 			That(errFunc.Called()).
 			That(errFunc.MessageFormatsTo("got empty slice []int{}"))
 	})
@@ -112,7 +112,7 @@ func TestNotEmpty(t *testing.T) {
 		assert.Using(errFunc.Record).That(theslice.NotEmpty[[]int](nil))
 
 		// then
-		assert.UsingFmt(t.Errorf).
+		assert.FailingTest(t).
 			That(errFunc.Called()).
 			That(errFunc.MessageFormatsTo("got empty slice []int(nil)"))
 	})
@@ -144,7 +144,7 @@ func TestEqual(t *testing.T) {
 			assert.Using(onErr.Record).That(theslice.Equal(tt, tt))
 
 			// then
-			assert.UsingFmt(t.Errorf).That(onErr.NotCalled())
+			assert.FailingTest(t).That(onErr.NotCalled())
 		})
 	}
 
@@ -240,7 +240,7 @@ func TestEqualElements(t *testing.T) {
 				That(theslice.EqualElements(tt.Got, tt.Want))
 
 			// then
-			assert.UsingFmt(t.Errorf).That(onErr.NotCalled())
+			assert.FailingTest(t).That(onErr.NotCalled())
 		})
 	}
 
@@ -337,7 +337,7 @@ func TestNotEqual(t *testing.T) {
 				That(theslice.NotEqual(tt.Slice, tt.Slice))
 
 			// then
-			assert.UsingFmt(t.Errorf).
+			assert.FailingTest(t).
 				That(errFunc.Called()).
 				That(errFunc.MessageFormatsTo(tt.Message))
 		})
@@ -366,7 +366,7 @@ func TestNotEqual(t *testing.T) {
 				That(theslice.NotEqual(tt.Got, tt.Want))
 
 			// then
-			assert.UsingFmt(t.Errorf).
+			assert.FailingTest(t).
 				That(errFunc.NotCalled())
 		})
 	}
@@ -396,7 +396,7 @@ func TestLength(t *testing.T) {
 				That(theslice.Length(tt.Slice, tt.Length))
 
 			// then
-			assert.UsingFmt(t.Errorf).That(errFunc.NotCalled())
+			assert.FailingTest(t).That(errFunc.NotCalled())
 		})
 	}
 
@@ -437,7 +437,7 @@ func TestLength(t *testing.T) {
 				That(theslice.Length(tt.Slice, tt.Length))
 
 			// then
-			assert.UsingFmt(t.Errorf).
+			assert.FailingTest(t).
 				That(errFunc.Called()).
 				That(errFunc.MessageFormatsTo(tt.Message))
 		})
@@ -479,7 +479,7 @@ func TestLengthNot(t *testing.T) {
 				That(theslice.LengthNot(tt.Slice, tt.Length))
 
 			// then
-			assert.UsingFmt(t.Errorf).That(errFunc.NotCalled())
+			assert.FailingTest(t).That(errFunc.NotCalled())
 		})
 	}
 
@@ -520,7 +520,7 @@ func TestLengthNot(t *testing.T) {
 				That(theslice.LengthNot(tt.Slice, tt.Length))
 
 			// then
-			assert.UsingFmt(t.Errorf).
+			assert.FailingTest(t).
 				That(errFunc.Called()).
 				That(errFunc.MessageFormatsTo(tt.Message))
 		})
@@ -566,7 +566,7 @@ func TestLengthAtLeast(t *testing.T) {
 				That(theslice.LengthAtLeast(tt.Slice, tt.Length))
 
 			// then
-			assert.UsingFmt(t.Errorf).That(errFunc.NotCalled())
+			assert.FailingTest(t).That(errFunc.NotCalled())
 		})
 	}
 
@@ -608,7 +608,7 @@ func TestLengthAtLeast(t *testing.T) {
 				That(theslice.LengthAtLeast(tt.Slice, tt.Length))
 
 			// then
-			assert.UsingFmt(t.Errorf).
+			assert.FailingTest(t).
 				That(errFunc.Called()).
 				That(errFunc.MessageFormatsTo(tt.Message))
 		})
@@ -627,7 +627,7 @@ func TestAt(t *testing.T) {
 			That(theslice.At([]int{3, 7, 4}, 1, theval.NotZero[int]))
 
 		// then
-		assert.UsingFmt(t.Errorf).That(errFunc.NotCalled())
+		assert.FailingTest(t).That(errFunc.NotCalled())
 	})
 
 	oopsCases := map[string]struct {
@@ -660,7 +660,7 @@ func TestAt(t *testing.T) {
 				That(theslice.At(tt.Slice, tt.At, tt.Assert))
 
 			// then
-			assert.UsingFmt(t.Errorf).
+			assert.FailingTest(t).
 				That(errFunc.Called()).
 				That(errFunc.MessageFormatsTo(tt.Message))
 		})

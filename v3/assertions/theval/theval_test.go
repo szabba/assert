@@ -216,7 +216,7 @@ func TestZero(t *testing.T) {
 		assert.Using(errFunc.Record).That(theval.Zero(0))
 
 		// then
-		assert.UsingFmt(t.Errorf).That(errFunc.NotCalled())
+		assert.FailingTest(t).That(errFunc.NotCalled())
 	})
 
 	t.Run("False", func(t *testing.T) {
@@ -227,7 +227,7 @@ func TestZero(t *testing.T) {
 		assert.Using(errFunc.Record).That(theval.Zero(1))
 
 		// then
-		assert.UsingFmt(t.Errorf).
+		assert.FailingTest(t).
 			That(errFunc.Called()).
 			That(errFunc.MessageFormatsTo("got 1, not zero value 0"))
 	})
@@ -242,7 +242,7 @@ func TestZero(t *testing.T) {
 		assert.Using(errFunc.Record).That(theval.NotZero(v))
 
 		// then
-		assert.UsingFmt(t.Errorf).That(errFunc.NotCalled())
+		assert.FailingTest(t).That(errFunc.NotCalled())
 	})
 
 }
@@ -257,7 +257,7 @@ func TestNotZero(t *testing.T) {
 		assert.Using(errFunc.Record).That(theval.NotZero(1))
 
 		// then
-		assert.UsingFmt(t.Errorf).That(errFunc.NotCalled())
+		assert.FailingTest(t).That(errFunc.NotCalled())
 	})
 
 	t.Run("False", func(t *testing.T) {
@@ -268,7 +268,7 @@ func TestNotZero(t *testing.T) {
 		assert.Using(errFunc.Record).That(theval.NotZero(0))
 
 		// then
-		assert.UsingFmt(t.Errorf).
+		assert.FailingTest(t).
 			That(errFunc.Called()).
 			That(errFunc.MessageFormatsTo("got zero value 0"))
 	})
@@ -283,7 +283,7 @@ func TestNotZero(t *testing.T) {
 		assert.Using(errFunc.Record).That(theval.NotZero(v))
 
 		// then
-		assert.UsingFmt(t.Errorf).
+		assert.FailingTest(t).
 			That(errFunc.Called()).
 			That(errFunc.MessageFormatsTo("got zero value <nil>"))
 	})

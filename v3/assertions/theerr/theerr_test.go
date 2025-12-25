@@ -44,7 +44,7 @@ func TestIsNil(t *testing.T) {
 		assert.Using(errFunc.Record).That(theerr.IsNil(nil))
 
 		// then
-		assert.UsingFmt(t.Errorf).That(errFunc.NotCalled())
+		assert.FailingTest(t).That(errFunc.NotCalled())
 	})
 
 	t.Run("False", func(t *testing.T) {
@@ -73,7 +73,7 @@ func TestIsNotNil(t *testing.T) {
 		assert.Using(errFunc.Record).That(theerr.IsNotNil(io.EOF))
 
 		// then
-		assert.UsingFmt(t.Errorf).That(errFunc.NotCalled())
+		assert.FailingTest(t).That(errFunc.NotCalled())
 	})
 
 	t.Run("False", func(t *testing.T) {
@@ -102,7 +102,7 @@ func TestIs(t *testing.T) {
 		assert.Using(errFunc.Record).That(theerr.Is(nil, nil))
 
 		// then
-		assert.UsingFmt(t.Errorf).That(errFunc.NotCalled())
+		assert.FailingTest(t).That(errFunc.NotCalled())
 	})
 
 	t.Run("True/Exact", func(t *testing.T) {
@@ -113,7 +113,7 @@ func TestIs(t *testing.T) {
 		assert.Using(errFunc.Record).That(theerr.Is(io.EOF, io.EOF))
 
 		// then
-		assert.UsingFmt(t.Errorf).That(errFunc.NotCalled())
+		assert.FailingTest(t).That(errFunc.NotCalled())
 	})
 
 	t.Run("True/Wrapped", func(t *testing.T) {
@@ -126,7 +126,7 @@ func TestIs(t *testing.T) {
 		assert.Using(errFunc.Record).That(theerr.Is(wrappedErr, io.EOF))
 
 		// then
-		assert.UsingFmt(t.Errorf).That(errFunc.NotCalled())
+		assert.FailingTest(t).That(errFunc.NotCalled())
 	})
 
 	t.Run("False", func(t *testing.T) {
@@ -139,7 +139,7 @@ func TestIs(t *testing.T) {
 		assert.Using(errFunc.Record).That(theerr.Is(newErr, io.EOF))
 
 		// then
-		assert.UsingFmt(t.Errorf).
+		assert.FailingTest(t).
 			That(errFunc.Called()).
 			That(errFunc.MessageFormatsTo(`got error "oops", not "EOF"`))
 	})
@@ -158,7 +158,7 @@ func TestIsA(t *testing.T) {
 			That(theerr.IsA[*os.PathError](err))
 
 		// then
-		assert.UsingFmt(t.Errorf).That(errFunc.NotCalled())
+		assert.FailingTest(t).That(errFunc.NotCalled())
 	})
 
 	t.Run("False/Nil", func(t *testing.T) {
@@ -170,7 +170,7 @@ func TestIsA(t *testing.T) {
 			That(theerr.IsA[*os.PathError](nil))
 
 		// then
-		assert.UsingFmt(t.Errorf).
+		assert.FailingTest(t).
 			That(errFunc.Called()).
 			That(errFunc.MessageFormatsTo("got nil error, not a *fs.PathError"))
 	})
@@ -185,7 +185,7 @@ func TestIsA(t *testing.T) {
 			That(theerr.IsA[*os.PathError](err))
 
 		// then
-		assert.UsingFmt(t.Errorf).
+		assert.FailingTest(t).
 			That(errFunc.Called()).
 			That(errFunc.MessageFormatsTo("got error of type *os.SyscallError, not *fs.PathError"))
 	})
