@@ -80,6 +80,7 @@ A common case for that is to call a function that at least outputs some informat
 To do that call [UsingFmt].
 
 	assert.UsingFmt(log.Panicf).That(0 > 1, "%d is not greater than %d", 0, 1)
+	assert.UsingFmt(log.Panicf).True(0 > 1, "%d is not greater than %d", 0, 1)
 
 The argument to [UsingFmt] has a the signature
 
@@ -88,16 +89,16 @@ The argument to [UsingFmt] has a the signature
 Many functions and methods in the standard library match this.
 For example:
 
-  - testing.(*T).Errorf
-  - testing.(*T).Fatalf
-  - log.Printf
-  - log.Panicf
-  - log.Fatalf
+  - [*testing.T.Errorf]
+  - [*testing.T.Fatalf]
+  - [log.Printf]
+  - [log.Panicf]
+  - [log.Fatalf]
 
 [UsingFmt] will pass messages of any non-nil errors to the function.
 
 Sometimes you might need the error itself - not just the message.
-In that case you want to call Using, not UsingPanic or [UsingFmt].
+In that case you want to call [Using], not [UsingPanic] or [UsingFmt].
 
 [assertions]: https://pkg.go.dev/github.com/szabba/assert/v3/assertions
 [theerr.IsNil]: https://pkg.go.dev/github.com/szabba/assert/v3/assertions/theerr#IsNil
