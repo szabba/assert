@@ -40,7 +40,7 @@ You can chain multiple assertions on it.
 
 # Reusable assertions
 
-[True] is good for ad hoc one-of assertions.
+[Asserter.True] is good for ad hoc one-of assertions.
 
 We provide some pre-made reusable [assertions], so you can call
 
@@ -89,7 +89,7 @@ Just write a function that returns a non-nil error when the assertion fails:
 	    if err != nil {
 			return fmt.Errorf("got unexpected non-nil error: %s", err)
 		}
-		retun nil
+		return nil
 	}
 
 You can then pass it's result to [That]:
