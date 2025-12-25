@@ -68,7 +68,7 @@ This means all failures are reported.
 			That(theval.Equal(1 + 2, 2))
 	}
 
-[FailingTestNow] is the analogue to [*testing.T.Fatal] / [*testing.T.Fatalf] / [*testing.T.FailNow].
+[FailingTestFast] is the analogue to [*testing.T.Fatal] / [*testing.T.Fatalf] / [*testing.T.FailNow].
 The asserter it returns fails the test when the first assertion fails and immediately stops the test.
 This means only the first failure is reported.
 
