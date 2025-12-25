@@ -25,39 +25,56 @@ package assert
 import "fmt"
 
 // UsingPanic creates an Asserter that panics to report failures.
-//
-// If you're using this library in tests you probably want UsingFmt instead.
 func UsingPanic() Asserter {
 	return Using(nil)
 }
 
 // Using creates an Asserter that uses onErr to report failures.
-//
-// Using is the most general of the Using* functions.
-//
-// If you're using this library in tests you probably want UsingFmt instead.
+// It is the most general of the Using* functions.
 func Using(onErr func(error)) Asserter {
-	return Asserter{onErr}
+	return Asserter{onErr: onErr}
 }
 
 // UsingFmt creates an Asserter that uses fmtFunc to report failures.
-//
-// If you're using this library in tests you probably want to call either
-//
-//	assert.UsingFmt(t.Errorf).That(somethingHolds())
-//
-// or
-//
-//	assert.UsingFmt(t.Fatalf).That(somethingHolds())
-//
-// depending on whether you want the test to continue on failure or not.
 func UsingFmt(fmtFunc func(string, ...any)) Asserter {
 	onErr := func(err error) { fmtFunc(err.Error()) }
-	return Asserter{onErr}
+	return Asserter{onErr: onErr}
+}
+
+// FailingTest creates an Asserter that fails the test t.Name() and reports all the failed assertions.
+func FailingTest(t T) Asserter {
+	return Asserter{
+		test: t,
+		onErr: func(err error) {
+			t.Helper()
+			t.Error(err)
+		},
+	}
+}
+
+// FailingTest creates an Asserter that fails and interrupts the test t.Name() as soon as the first assertion fails.
+func FailingTestFast(t T) Asserter {
+	return Asserter{
+		test: t,
+		onErr: func(err error) {
+			t.Helper()
+			t.Fatal(err)
+		},
+	}
 }
 
 // An Asserter is used to make assertions.
-type Asserter struct{ onErr func(error) }
+type Asserter struct {
+	test  T
+	onErr func(error)
+}
+
+// A T contains the subset of the [*testing.T] methods used by Asserters that fail Go tests.
+type T interface {
+	Helper()
+	Error(args ...any)
+	Fatal(args ...any)
+}
 
 // That asserts there is no problem (ie, the error is nil).
 //
@@ -71,6 +88,9 @@ type Asserter struct{ onErr func(error) }
 // If it panics, the chain is interrupted.
 func (a Asserter) That(err error) Asserter {
 	if err != nil {
+		if a.test != nil {
+			a.test.Helper()
+		}
 		a.fail(err)
 	}
 	return a
@@ -88,6 +108,9 @@ func (a Asserter) That(err error) Asserter {
 // If it panics, the chain is interrupted.
 func (a Asserter) True(cond bool, msgFmt string, args ...any) Asserter {
 	if !cond {
+		if a.test != nil {
+			a.test.Helper()
+		}
 		err := fmt.Errorf(msgFmt, args...)
 		a.fail(err)
 	}
@@ -95,9 +118,11 @@ func (a Asserter) True(cond bool, msgFmt string, args ...any) Asserter {
 }
 
 func (a Asserter) fail(err error) {
+	if a.test != nil {
+		a.test.Helper()
+	}
 	if a.onErr == nil {
 		panic(err.Error())
 	}
-
 	a.onErr(err)
 }
