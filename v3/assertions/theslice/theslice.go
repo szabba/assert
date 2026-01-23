@@ -50,7 +50,7 @@ func NotEmpty[S ~[]T, T any](s S) error {
 // Only slices of equal length can be equal.
 // The elements at each index must be equal in both slices.
 func Equal[S ~[]T, T comparable](got, want S) error {
-	return EqualFunc(got, want, func(l, r T) bool { return l == r })
+	return EqualFunc(got, want, comparableEq)
 }
 
 // EqualFunc asserts that an actual slice is equal to an expected one, element-by-element.
@@ -78,7 +78,7 @@ func EqualFunc[S ~[]T, T any](got, want S, eq func(T, T) bool) error {
 // Only slices of equal length can have equal.
 // The elements at each index must be equal in both slices.
 func EqualElements[S ~[]T, T comparable](got, want S) error {
-	return EqualElementsFunc(got, want, func(l, r T) bool { return l == r })
+	return EqualElementsFunc(got, want, comparableEq)
 }
 
 // EqualElementsFunc asserts that two slices have all elements equal, element-by-element.
@@ -186,3 +186,79 @@ func At[S ~[]T, T any](s S, i int, f func(t T) error) error {
 
 	return nil
 }
+
+// IsPrefix asserts that gotPrefix is a non-strict prefix of another slice.
+//
+// The first len(gotPrefix) elements of both slices must be equal.
+// Because IsPrefix checks for a non-strict prefix, gotPrefix and of can have equal length.
+func IsPrefix[S ~[]T, T comparable](gotPrefix, of S) error {
+	return IsPrefixFunc(gotPrefix, of, comparableEq)
+}
+
+// IsPrefixFunc asserts that gotPrefix is a non-strict prefix of another slice.
+// Elements are compared for equality using the function eq.
+//
+// The first len(gotPrefix) elements of both slices must be equal.
+// Because IsPrefixFunc checks for a non-strict prefix, gotPrefix and of can have equal length.
+func IsPrefixFunc[S ~[]T, T any](gotPrefix, of S, eq func(T, T) bool) (err error) {
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("got slice %#v, not a prefix of %#v: %w", gotPrefix, of, err)
+		}
+	}()
+
+	if len(gotPrefix) > len(of) {
+		return fmt.Errorf(
+			"actual slice longer (%d) than reference (%d)",
+			len(gotPrefix), len(of))
+	}
+
+	for i := range gotPrefix {
+		if !eq(gotPrefix[i], of[i]) {
+			return fmt.Errorf(
+				"slices start differing at index %d: got %#v, not %#v",
+				i, gotPrefix[i], of[i])
+		}
+	}
+
+	return nil
+}
+
+// HasPrefix asserts that got has another slice as a non-strict prefix.
+//
+// The first len(wantPrefix) elements of both slices must be equal.
+// Because HasPrefix checks for a non-strict prefix, gotPrefix and of can have equal length.
+func HasPrefix[S ~[]T, T comparable](got, wantPrefix S) error {
+	return HasPrefixFunc(got, wantPrefix, comparableEq)
+}
+
+// HasPrefix asserts that got has another slice as a non-strict prefix.
+// Elements are compared for equality using the function eq.
+//
+// The first len(wantPrefix) elements of both slices must be equal.
+// Because HasPrefix checks for a non-strict prefix, gotPrefix and of can have equal length.
+func HasPrefixFunc[S ~[]T, T any](got, wantPrefix S, eq func(T, T) bool) (err error) {
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("got %#v, not slice with prefix %#v: %w", got, wantPrefix, err)
+		}
+	}()
+
+	if len(got) < len(wantPrefix) {
+		return fmt.Errorf(
+			"slice shorter (%d) than expected prefix (%d)",
+			len(got), len(wantPrefix))
+	}
+
+	for i := range wantPrefix {
+		if !eq(got[i], wantPrefix[i]) {
+			return fmt.Errorf(
+				"slices start differing at index %d: got %#v, not %#v",
+				i, got[i], wantPrefix[i])
+		}
+	}
+
+	return nil
+}
+
+func comparableEq[T comparable](l, r T) bool { return l == r }

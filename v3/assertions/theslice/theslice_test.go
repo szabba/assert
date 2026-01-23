@@ -405,7 +405,7 @@ func TestLength(t *testing.T) {
 		Length  int
 		Message string
 	}{
-		"False/NilHasLenght1": {
+		"False/NilHasLength1": {
 			Slice:   nil,
 			Length:  1,
 			Message: "got slice of length 0, not 1",
@@ -665,6 +665,140 @@ func TestAt(t *testing.T) {
 				That(errFunc.MessageFormatsTo(tt.Message))
 		})
 	}
+
+}
+
+func TestIsPrefix(t *testing.T) {
+
+	t.Run("True", func(t *testing.T) {
+		// given
+		okCases := map[string]struct {
+			Got, PrefixOf []int
+		}{
+			"Empty": {},
+			"EmptyOfLen2": {
+				Got: []int{}, PrefixOf: []int{1, 4},
+			},
+			"EqualLen1": {
+				Got: []int{1}, PrefixOf: []int{1},
+			},
+			"EqualLen2": {
+				Got: []int{1, 3}, PrefixOf: []int{1, 3},
+			},
+		}
+
+		for name, tt := range okCases {
+			t.Run(name, func(t *testing.T) {
+				var errFunc assertiontesting.ErrFunc
+
+				// when
+				assert.Using(errFunc.Record).
+					That(theslice.IsPrefix(tt.Got, tt.PrefixOf))
+
+				// then
+				assert.FailingTest(t).That(errFunc.NotCalled())
+			})
+		}
+	})
+
+	t.Run("False", func(t *testing.T) {
+		// given
+		oopsCases := map[string]struct {
+			Got, PrefixOf []int
+			Msg           string
+		}{
+			"NonEmptyOfEmpty": {
+				Got: []int{3}, PrefixOf: []int{},
+				Msg: "got slice []int{3}, not a prefix of []int{}: actual slice longer (1) than reference (0)",
+			},
+			"FirstDiffers": {
+				Got: []int{1, 3, 5}, PrefixOf: []int{0, 3, 5},
+				Msg: "got slice []int{1, 3, 5}, not a prefix of []int{0, 3, 5}: slices start differing at index 0: got 1, not 0",
+			},
+		}
+
+		for name, tt := range oopsCases {
+			t.Run(name, func(t *testing.T) {
+				var errFunc assertiontesting.ErrFunc
+
+				// when
+				assert.Using(errFunc.Record).
+					That(theslice.IsPrefix(tt.Got, tt.PrefixOf))
+
+				// then
+				assert.FailingTest(t).
+					That(errFunc.Called()).
+					That(errFunc.MessageFormatsTo(tt.Msg))
+			})
+		}
+	})
+
+}
+
+func TestHasPrefix(t *testing.T) {
+
+	t.Run("True", func(t *testing.T) {
+		// given
+		okCases := map[string]struct {
+			Got, WantPrefix []int
+		}{
+			"Empty": {},
+			"EmptyOfLen2": {
+				Got: []int{1, 4}, WantPrefix: []int{},
+			},
+			"EqualLen1": {
+				Got: []int{1}, WantPrefix: []int{1},
+			},
+			"EqualLen2": {
+				Got: []int{1, 3}, WantPrefix: []int{1, 3},
+			},
+		}
+
+		for name, tt := range okCases {
+			t.Run(name, func(t *testing.T) {
+				var errFunc assertiontesting.ErrFunc
+
+				// when
+				assert.Using(errFunc.Record).
+					That(theslice.HasPrefix(tt.Got, tt.WantPrefix))
+
+				// then
+				assert.FailingTest(t).That(errFunc.NotCalled())
+			})
+		}
+	})
+
+	t.Run("False", func(t *testing.T) {
+		// given
+		oopsCases := map[string]struct {
+			Got, WantPrefix []int
+			Msg             string
+		}{
+			"NonEmptyOfEmpty": {
+				Got: []int{}, WantPrefix: []int{3},
+				Msg: "got []int{}, not slice with prefix []int{3}: slice shorter (0) than expected prefix (1)",
+			},
+			"FirstDiffers": {
+				Got: []int{1, 3, 5}, WantPrefix: []int{0, 3, 5},
+				Msg: "got []int{1, 3, 5}, not slice with prefix []int{0, 3, 5}: slices start differing at index 0: got 1, not 0",
+			},
+		}
+
+		for name, tt := range oopsCases {
+			t.Run(name, func(t *testing.T) {
+				var errFunc assertiontesting.ErrFunc
+
+				// when
+				assert.Using(errFunc.Record).
+					That(theslice.HasPrefix(tt.Got, tt.WantPrefix))
+
+				// then
+				assert.FailingTest(t).
+					That(errFunc.Called()).
+					That(errFunc.MessageFormatsTo(tt.Msg))
+			})
+		}
+	})
 
 }
 
