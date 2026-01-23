@@ -171,7 +171,7 @@ func LengthAtLeast[S ~[]T, T any](s S, n int) error {
 	return nil
 }
 
-// At assers that the i-th element of s passes the assertion in f.
+// At asserts that the i-th element of s passes the assertion in f.
 func At[S ~[]T, T any](s S, i int, f func(t T) error) error {
 	err := LengthAtLeast(s, i+1)
 	if err != nil {
