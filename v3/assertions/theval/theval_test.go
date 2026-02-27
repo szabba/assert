@@ -239,7 +239,7 @@ func TestZero(t *testing.T) {
 		var errFunc assertiontesting.ErrFunc
 
 		// when
-		assert.Using(errFunc.Record).That(theval.NotZero(v))
+		assert.Using(errFunc.Record).That(theval.Zero(v))
 
 		// then
 		assert.FailingTest(t).That(errFunc.NotCalled())
