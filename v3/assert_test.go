@@ -23,6 +23,8 @@
 package assert_test
 
 import (
+	"errors"
+	"fmt"
 	"testing"
 
 	"github.com/szabba/assert/v3"
@@ -92,6 +94,41 @@ func TestFailingAssertionCallsNonNilErrorFunc(t *testing.T) {
 	wantMsg := "Oops: false"
 	if got.err.Error() != wantMsg {
 		t.Errorf("Error passd to handler has message %v, not %v", got.err.Error(), wantMsg)
+	}
+}
+
+func TestThatfDoesNotFailGivenANilError(t *testing.T) {
+	// given
+	err := error(nil)
+
+	got, called := error(nil), false
+	onErr := func(err error) { got, called = err, true }
+
+	// when
+	assert.Using(onErr).Thatf(err, "should not occur")
+
+	// then
+	if called {
+		t.Errorf("the error reporting function was called with: %s", got)
+	}
+}
+
+func TestThatfDoesFailGivenANonNilError(t *testing.T) {
+	// given
+	err := fmt.Errorf("oops")
+
+	got, called := error(nil), false
+	onErr := func(err error) { got, called = err, true }
+
+	// when
+	assert.Using(onErr).Thatf(err, "should not occur")
+
+	// then
+	if !called {
+		t.Errorf("the error reporting function was not called")
+	}
+	if !errors.Is(got, err) {
+		t.Errorf("got error %q, not %q", got, err)
 	}
 }
 

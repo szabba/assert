@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2022-2025 Karol Marcjan
+// Copyright (c) 2022-2026 Karol Marcjan
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -42,7 +42,7 @@ You can chain multiple assertions on it.
 
 [Asserter.True] is good for ad hoc one-of assertions.
 
-We provide some pre-made reusable [assertions], so you can call
+We provide some pre-made reusable assertions, so you can call
 
 	assert.UsingPanic().That(theval.Equal(got, want))
 
@@ -50,8 +50,48 @@ instead of
 
 	assert.UsingPanic().True(got == want, "got %#v, not %#v", got, want)
 
+See [github.com/szabba/assert/v3/assertions] for a list.
+
 As long as the reusable assertion is well named, the first version is easier to read.
 It is also less error prone and easier to modify.
+
+If you need to provide context about a particular assertion you can use [Asserter.Thatf]:
+
+	assert.UsingPanic().
+		Thatf(theval.Equal(got.X(), want.X(), "x")).
+		Thatf(theval.Equal(got.Y(), want.Y(), "y"))
+
+	for i, v := range got.Slice() {
+		assert.UsingPanic().
+			Thatf(theval.Equal(v, 0), "slice[%d]", i)
+	}
+
+# Custom assertions
+
+You can write your own reusable assertions.
+That is especially useful when you have something you can
+
+Just write a function that returns a non-nil error when the assertion fails:
+
+	func ErrIsNil(err error) error {
+	    if err != nil {
+			return fmt.Errorf("got unexpected non-nil error: %s", err)
+		}
+		return nil
+	}
+
+You can then pass it's result to [Asserter.That]:
+
+	assert.UsingPanic().That(ErrIsNil(err))
+
+You don't have to write the function in this example though.
+Just use [github.com/szabba/assert/v3/assertions/theerr.IsNil].
+
+Consider naming the package and functions so the usage reads like
+
+	assert.UsingPanic().That(thetype.Property(got, parameter))
+
+where got is an actual value produced by the code under test.
 
 # Usage in tests
 
@@ -80,28 +120,9 @@ This means only the first failure is reported.
 			That(theval.Equal(nums[0], 4))
 	}
 
-# Custom assertions
+# Other failure reactions
 
-You can write your own reusable assertions.
-Just write a function that returns a non-nil error when the assertion fails:
-
-	func ErrIsNil(err error) error {
-	    if err != nil {
-			return fmt.Errorf("got unexpected non-nil error: %s", err)
-		}
-		return nil
-	}
-
-You can then pass it's result to [That]:
-
-	assert.UsingPanic().That(ErrIsNil(err))
-
-You don't have to write the function in this example though.
-Just use [theerr.IsNil].
-
-# Alternative failure reactions
-
-Depending on the situation you might want different reactions to a failed assertion.
+Depending on the situation you might want other reactions to a failed assertion.
 
 A common case for that is to call a function that at least outputs some information.
 To do that call [UsingFmt].
@@ -124,9 +145,6 @@ For example:
 [UsingFmt] will pass messages of any non-nil errors to the function.
 
 Sometimes you might need the error itself - not just the message.
-In that case you want to call [Using], not [UsingPanic] or [UsingFmt].
-
-[assertions]: https://pkg.go.dev/github.com/szabba/assert/v3/assertions
-[theerr.IsNil]: https://pkg.go.dev/github.com/szabba/assert/v3/assertions/theerr#IsNil
+In that case you want to call [Using].
 */
 package assert

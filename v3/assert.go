@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2022-2025 Karol Marcjan
+// Copyright (c) 2022-2026 Karol Marcjan
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -78,14 +78,7 @@ type T interface {
 
 // That asserts there is no problem (ie, the error is nil).
 //
-// The error func of the asserter receives any non-nil error passed in.
-// If the asserter has a nil error func, That panics with the message of the error.
-//
-// When the assertion passes, the same asserter is returned.
-// This enables chaining multiple assertions that share an error func.
-//
-// When the assertion fails, the error func is called before returning.
-// If it panics, the chain is interrupted.
+// If the error-reporting function does not panic, the asserter is returned to allow method chaining.
 func (a Asserter) That(err error) Asserter {
 	if err != nil {
 		if a.test != nil {
@@ -96,16 +89,25 @@ func (a Asserter) That(err error) Asserter {
 	return a
 }
 
+// Thatf asserts that there is no problem (ie, the error is nil) providing additional context about it.
+//
+// If the error-reporting function does not panic, the asserter is returned to allow method chaining.
+func (a Asserter) Thatf(err error, msgFmt string, args ...any) Asserter {
+	if err != nil {
+		if a.test != nil {
+			a.test.Helper()
+		}
+		args = append(append([]any{}, args...), err)
+		err = fmt.Errorf(msgFmt+": %w", args...)
+		a.fail(err)
+	}
+	return a
+}
+
 // True asserts cond is true.
+// When cond is false, msgFmt and args are passed to [fmt.Errorf] to build the reported error.
 //
-// The error func of the asserter receives msgFmt and args as input.
-// If the asserter has a nil error func, True panics with a message formatted by fmt.Sprintf.
-//
-// When the assertion passes, the same asserter is returned.
-// This enables chaining multiple assertions that share and error func.
-//
-// When the assertion fails, the error func is called before returning.
-// If it panics, the chain is interrupted.
+// If the error-reporting function does not panic, the asserter is returned to allow method chaining.
 func (a Asserter) True(cond bool, msgFmt string, args ...any) Asserter {
 	if !cond {
 		if a.test != nil {
